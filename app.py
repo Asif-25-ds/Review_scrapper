@@ -4,8 +4,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen as uReq
 import logging
+import pymongo
 logging.basicConfig(filename="scrapper.log" , level=logging.INFO)
-
+client=pymongo.MongoClient("mongodb+srv://Mohd_Asif_Khan:pwskills@cluster0.orm7lve.mongodb.net/?retryWrites=true&w=majority")
+db=client["scrapped_data"]
+coll_scrap=db["scapped_values"]
 app = Flask(__name__)
 
 @app.route("/", methods = ['GET'])
@@ -71,6 +74,7 @@ def index():
                 mydict = {"Product": searchString, "Name": name, "Rating": rating, "CommentHead": commentHead,
                           "Comment": custComment}
                 reviews.append(mydict)
+                coll_scrap.insert_one(mydict)
             logging.info("log my final result {}".format(reviews))
             return render_template('result.html', reviews=reviews[0:(len(reviews)-1)])
         except Exception as e:
